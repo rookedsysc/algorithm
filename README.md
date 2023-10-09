@@ -1,2 +1,1 @@
-# algorithm-study
-Collection of LeetCode questions to ace the coding interview! - Created using [LeetHub](https://github.com/QasimWani/LeetHub)
+algorithm problem solving space
