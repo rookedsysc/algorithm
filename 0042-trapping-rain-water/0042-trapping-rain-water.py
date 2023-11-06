@@ -1,20 +1,17 @@
 class Solution:
   def trap(self, height: list[int]) -> int:
     ans = 0
-    l, r = 0, len(height) - 1
-    max_l, max_r = height[l], height[r]
-    while l <= r : 
-      if max_r < max_l :
-        if max_r > height[r] :
-          ans += max_r - height[r]
-        max_r = max(max_r,height[r])
-        r -= 1
-        
-      else :
-        if max_l > height[l] : 
-          ans += max_l - height[l]
-        max_l = max(max_l,height[l])
-        l += 1
+    lh, rh = 0, len(height) - 1 
+    max_lh, max_rh = height[0], height[rh]
+    
+    while lh < rh :
+      if max_lh > max_rh :
+        rh -= 1
+        max_rh = max(max_rh, height[rh])
+        ans += max_rh - height[rh]
+      else  :
+        lh += 1
+        max_lh = max(max_lh, height[lh])
+        ans += max_lh - height[lh]
         
     return ans
-  
