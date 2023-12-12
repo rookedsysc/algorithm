@@ -1,29 +1,39 @@
 N, r, c = map(int, input().split())
 
-ans = 0
+def multiple_2(n):
+  ans = 1
+  for i in range(n):
+    ans *= 2
+  return ans
 
-while N != 0:
+def recursion(n, r, c):
+  ans = 0
+  if n == 1:
+    if [0, 0] == [r, c]:
+      return 0
+    elif [0, 1] == [r, c]:
+      return 1
+    elif [1, 0] == [r, c]:
+      return 2
+    else :
+      return 3
 
-	N -= 1
+  cur_multiple = multiple_2(n - 1)
+  # 2 사분면에 있는 경우
+  if r < cur_multiple <= c:
+    c -= cur_multiple
+    ans += cur_multiple * cur_multiple
+  # 3 사분면에 있는 경우
+  elif c < cur_multiple <= r:
+    r -= cur_multiple
+    ans += cur_multiple * cur_multiple * 2
+  # 4 사분면에 있는 경우
+  elif cur_multiple <= c and cur_multiple <= r:
+    c -= cur_multiple
+    r -= cur_multiple
+    ans += cur_multiple * cur_multiple * 3
+  ans += recursion(n - 1, r, c)
+  return ans
 
-	# 1사분면
-	if r < 2 ** N and c < 2 ** N:
-		ans += ( 2 ** N ) * ( 2 ** N ) * 0
 
-	# 2사분면
-	elif r < 2 ** N and c >= 2 ** N: 
-		ans += ( 2 ** N ) * ( 2 ** N ) * 1
-		c -= ( 2 ** N )
-        
-	# 3사분면    
-	elif r >= 2 ** N and c < 2 ** N: 
-		ans += ( 2 ** N ) * ( 2 ** N ) * 2
-		r -= ( 2 ** N )
-        
-	# 4사분면    
-	else:
-		ans += ( 2 ** N ) * ( 2 ** N ) * 3
-		r -= ( 2 ** N )
-		c -= ( 2 ** N )
-    
-print(ans)
+print(recursion(N, r, c))
