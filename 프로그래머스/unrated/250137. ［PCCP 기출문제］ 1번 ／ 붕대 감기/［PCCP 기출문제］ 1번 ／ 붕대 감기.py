@@ -1,29 +1,35 @@
 from collections import deque
 
+
 def solution(bandage, health, attacks):
-  max_health = health
-  q = deque(attacks)
-  count = 0
-  game_round = 0
+  answer = 0
+  gmcnt = 0
+  cnt = 0
+  maxhp = health
+  attacks = deque(attacks)
 
-  def plushealth(plus):
-    if health + plus > max_health:
-      return max_health
-    return health + plus
-
-  while q:
-    if game_round == q[0][0]:
-      _, b = q.popleft()
-      health -= b
-      count = 0
+  while attacks:
+    # 공격이 있다면
+    if attacks[0][0] == gmcnt:
+      attack = attacks.popleft()
+      health -= attack[1]
+      # 연속 공격 초기화
+      cnt = 0
+      # 죽으면 -1 리턴
       if health <= 0:
         return -1
+    # 공격이 없는 경우
     else:
-      count += 1
-      if count != bandage[0]:
-        health = plushealth(bandage[1])
+      cnt += 1
+      # 연속 공격 성공했을 경우
+      if bandage[0] == cnt:
+        cnt = 0
+        health = min(maxhp, health + bandage[1] + bandage[2])
       else:
-        count = 0
-        health = plushealth(bandage[2] + bandage[1])
-    game_round += 1
+        health = min(maxhp, health + bandage[1])
+    gmcnt += 1
+
   return health
+
+
+
