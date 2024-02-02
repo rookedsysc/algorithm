@@ -1,21 +1,19 @@
 def solution(survey, choices):
-    ans = ''
-    mbti_hash = { 'R':0, 'C':0,'J':0,'A':0,'T':0,'F':0,'M':0,'N':0}
+    types = {"R": 0, "T":0, "C":0, "F":0,"J":0,"M":0, "A":0, "N":0} 
+    scope = ["RT", "CF", "JM", "AN"]
+    answer = ''
     
-    for i in range(len(choices)):
-        if choices[i] > 4 :
-            mbti_hash[survey[i][1]] += choices[i] - 4
-        
-        elif choices[i] < 4 :
-            mbti_hash[survey[i][0]] += 4 - choices[i]
+    for i in range(len(survey)) :
+        choice = choices[i]
+        if choice > 4 :
+            types[survey[i][0]] += choice - 4
+        elif choice < 4 :
+            types[survey[i][1]] += 4 - choice
     
-    first = [ 'R', 'C', 'J','A' ]
-    second = [ 'T', 'F', 'M','N' ]
-    
-    for i in range(len(first)):
-        if mbti_hash[first[i]] >= mbti_hash[second[i]] :
-            ans += first[i]
+    for s in scope :
+        if types[s[1]] < types[s[0]] :
+            answer += s[1]
         else :
-            ans += second[i]
+            answer += s[0]
         
-    return ans
+    return answer
