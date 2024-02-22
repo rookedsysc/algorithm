@@ -18,10 +18,15 @@ def solution(stones, k) :
         ct = 0
       if ct >= k :
         break
+    # 건너뛴 횟수가 k 보다 작다면
+    # left 값을 더 늘려서 더 큰 값을 찾음
     if ct < k :
       left = mid + 1
+    # ct가 k 보다 크거나 같다면
+    # right 값을 줄여서 재탐색
     else :
       answer = mid
       right = mid - 1
-
+ 
   return answer
+
