@@ -1,54 +1,24 @@
 def solution(dartResult):
-    nums = [str(i) for i in range(11)]
-    tmp = []
-    ans_list = []
-    answer = 0
-    prev = 0
-    cur = 0
-    prev_val = None
-    for d in list(dartResult) :
-        if prev_val and d in nums :
-            prev_val += str(d)
-        elif d in nums : 
-            prev_val = str(d)
-        elif prev_val and d not in nums :
-            tmp.append(prev_val)
-            tmp.append(d)
-            prev_val = None
-        else :
-            tmp.append(d)
-    if prev_val :
-        tmp.append(prev_val)
-        
-    print(tmp)
-            
-    for d in tmp :
-        if d in nums :
-            ans_list.append(prev)
-            answer += prev
-            prev = cur 
-            cur = int(d)
-        elif d.isalpha() :
-            if d == 'D' :
-                cur = cur ** 2
-            elif d == 'T' :
-                cur = cur ** 3
-        elif d == '*' :
-            prev *= 2
-            cur *= 2
-        elif d == "#" :
-            cur *= -1
-    answer += prev
-    answer += cur 
-    ans_list.append(prev)
-    ans_list.append(cur)
-    print(ans_list)
-        
-    return answer
-''' 
-s : ** 1
-d : ** 2
-t : ** 3
-* : prev * 2 + cur * 2 
-# : 
-'''
+    # 0. 입력 및 초기화
+    scores = []
+    start_idx = 0
+    power = {'S' : 1, 'D' : 2, 'T' : 3 }
+
+    # 1. dartResult 별로 처리
+    for i in range(len(dartResult)):
+        op = dartResult[i]
+        if op in power:
+            scores.append(int(dartResult[start_idx:i]) ** power[op])
+        elif op == '*':
+            scores[-2:] = [x * 2 for x in scores[-2:]]
+        elif op == '#':
+            scores[-1] = -scores[-1]
+
+        if not op.isdigit():
+            start_idx = i + 1
+
+    # 2. scores의 합을 반환
+    return sum(scores)
+
+
+solution('1S2D*3T')
