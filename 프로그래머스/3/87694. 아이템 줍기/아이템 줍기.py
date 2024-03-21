@@ -1,59 +1,38 @@
 from collections import deque
 
+def bfs(graph, start, target) :
+  visited = [[False for _ in range(102)] for _ in range(102)]
+  direction = [[1,0], [-1,0], [0,1], [0,-1]]
 
-def bfs(graph, start, target):
   q = deque()
-  q.append([0, start[0], start[1]])
-  visited = [[False for _ in range(50)] for _ in range(50)]
-  _d = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+  q.append([start[0], start[1], 0])
 
-  while q:
-    cnt, curY, curX = q.popleft()
-    if [curY, curX] == target:
+  while q :
+    y, x, cnt = q.popleft()
+    if [y,x] == target :
       return cnt
-    cnt += 1
-    for d in _d:
-      nextX = curX + d[0]
-      nextY = curY + d[1]
-      if graph[nextY][nextX] == 0:
-        continue
-      if (1 <= nextX <= 50) and (1 <= nextY <= 50):
-        if not visited[nextY][nextX]:
-          visited[nextY][nextX] = True
-          q.append([cnt, nextY, nextX])
+    for d in direction :
+      ny, nx = y + d[0], x + d[1]
+      if -1 < ny < 102 and -1 < nx < 102 :
+        if graph[ny][nx] == 1 :
+          if not visited[ny][nx] :
+            q.append([ny, nx, cnt + 1])
+            visited[ny][nx] = True
   return -1
-
-
-def fillGraph(graph, r):
-  lx, ly, rx, ry = r
-  q = deque()
-  q.append([ly + 1, lx + 1])
-  visited = [[False for _ in range(51)] for _ in range(51)]
-  _d = [[1, 0], [-1, 0], [0, 1], [0, -1], [1,1], [1,-1], [-1,1], [-1,-1]]
-
-  while q:
-    curY, curX = q.popleft()
-    graph[curY][curX] = 0
-
-    for d in _d:
-      nextX = curX + d[0]
-      nextY = curY + d[1]
-      if (lx < nextX < rx) and (ly < nextY < ry):
-        if not visited[nextY][nextX] :
-          if graph[nextY][nextX] != 0 :
-              visited[nextY][nextX] = True
-              q.append([nextY, nextX])
-  return graph
-
-
 def solution(rectangle, characterX, characterY, itemX, itemY):
-  graph = [[1 for _ in range(51)] for _ in range(51)]
-
+  answer = 0
+  graph = [[-1 for _ in range(102)] for _ in range(102)]
   for r in rectangle:
-    graph = fillGraph(graph, r)
-
-  start = [characterY, characterX]
-  end = [itemY, itemX]
-  cnt = bfs(graph, start, end)
-
-  return cnt
+    # 좌측 하단 x, 좌측 하단 y, 우측 상단 x, 우측 상단 y
+    lx, ly, rx, ry = map(lambda x: x * 2, r)
+    for y in range(ly, ry + 1):
+      for x in range(lx, rx + 1):
+        # 모서리인 경우
+        if x == lx or x == rx or y == ly or y == ry:
+          if graph[y][x] != 0 :
+            graph[y][x] = 1
+        else:
+          # 안쪽은 접근 불가능 하도록
+          graph[y][x] = 0
+  answer = bfs(graph, [characterY * 2, characterX * 2], [itemY * 2, itemX * 2])  // 2
+  return answer
