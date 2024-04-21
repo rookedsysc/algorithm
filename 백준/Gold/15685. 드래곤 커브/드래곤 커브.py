@@ -1,81 +1,39 @@
-from collections import deque
+import sys
 
-N = int(input())
-graph = [[0 for _ in range(200)] for _ in range(200)]
-all_edge = deque()
-visited = []
-move_rule = {
-  0: [0,1], 1: [-1,0], 2: [0,-1], 3: [1,0]
-}
-dragon_rule = {
-  0:1,1:2,2:3,3:0
-}
-move = []
+input = sys.stdin.readline
 
-for _ in range(N):
-  move = []
-  x, y, d, g = map(int, input().split())
+# 동-북-서-남
+dx = [0, -1, 0, 1]
+dy = [1, 0, -1, 0]
 
-  # 다음 움직일 장소 정렬
-  cur_move = move_rule[d]
-  ny, nx = y + cur_move[0], x + cur_move[1]
-  graph[y][x], graph[ny][nx] = 1, 1
-  all_edge.append([y,x])
-  all_edge.append([ny,nx])
+if __name__ == "__main__":
+    n = int(input())
+    board = [[0] * 101 for _ in range(101)]
+    for _ in range(n):
+        # ⚠️ 좌표 주의! 문제에서는 가로가 x, 세로가 y
+        # 근데 일반적으로 나는 문제를 풀때 가로가 y, 세로가 x이므로 순서 전환 필요
+        y, x, d, g = map(int, input().split())
+        board[x][y] = 1
+        temp = [d]
+        q = [d]  # 이동방향
+        for _ in range(g + 1):  # 0~g세대
+            for k in q:
+                x += dx[k]
+                y += dy[k]
+                board[x][y] = 1
+            q = [(i + 1) % 4 for i in temp]
+            q.reverse()
+            temp = temp + q
 
-  last = [ny, nx]
-  move.append(d)
-  for _ in range(g) :
-    tmp = len(move) - 1
-    for m in range(tmp, -1, -1) :
-      # 다음 이동 결정
-      nm = dragon_rule[move[m]]
-      move.append(nm) # 움직인 방향 추가
-      cur_move = move_rule[nm]
+    result = 0
+    for i in range(100):
+        for j in range(100):
+            if (
+                board[i][j]
+                and board[i][j + 1]
+                and board[i + 1][j]
+                and board[i + 1][j + 1]
+            ):
+                result += 1
 
-      # 다음 장소로 이동 후 저장
-      ny, nx = last[0] + cur_move[0], last[1] + cur_move[1]
-      all_edge.append([ny, nx])
-      graph[ny][nx] = 1
-
-      last = [ny,nx] # 마지막 움직인 곳 변경
-
-cnt = 0
-def check(v1, v2, v3, v4) :
-  global cnt
-  if graph[v1[0]][v1[1]] and graph[v2[0]][v2[1]] and graph[v3[0]][v3[1]] and graph[v4[0]][v4[1]] :
-    visit = [v1, v2, v3, v4]
-    visit.sort()
-    if not (visit in visited) :
-      cnt += 1
-      visited.append(visit)
-
-while all_edge :
-  y, x = all_edge.popleft()
-  # 1사분면 확인
-  check([y,x], [y+1, x], [y+1, x+1], [y,x+1])
-  # 2사분면 확인
-  check([y,x], [y-1, x], [y-1, x+1], [y,x+1])
-  # 3사분면 확인
-  check([y,x], [y-1, x], [y-1, x-1], [y,x-1])
-  # 4사분면 확인
-  check([y,x], [y+1, x], [y+1, x-1], [y,x-1])
-
-print(cnt)
-
-
-
-'''
-3
-3 3 0 1
-4 2 1 3
-4 2 2 1
-x,y = 드래곤 커브의 시작 점
-0: [0,1], 1: [-1,0], 2: [0,-1], 3: [1,0]
-0의 드래곤 커브 : 3
-1의 드래곤 커브 : 0
-2의 드래곤 커브 : 1
-3의 드래곤 커브 : 2
-[1, 2]
-'''
-
+    print(result)
