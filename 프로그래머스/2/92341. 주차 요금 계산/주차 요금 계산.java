@@ -1,71 +1,65 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 class Solution {
     public int[] solution(int[] fees, String[] records) {
         HashMap<String, String> ps = new HashMap<>();
-        HashMap<String, Integer> useTime = new HashMap<>();
-
-        for (String r : records) {
-            String[] temp = r.split(" ");
-            String time = temp[0];
-            String carN = temp[1];
-            String command = temp[2];
-
-            if (command.equals("IN")) {
-                ps.put(carN, time);
-            } else {
-                String start = ps.get(carN);
-                Integer use = subtractTime(start, time);
-                Integer rest = useTime.getOrDefault(carN, 0);
-                ps.remove(carN);
-                useTime.put(carN, rest + use);
+        HashMap<String, Integer> rt = new HashMap<>();
+        for(String r : records) {
+            String curTime = r.split(" ")[0];
+            String carNumber = r.split(" ")[1];
+            String op = r.split(" ")[2];
+            if(op.equals("IN"))  {
+            	ps.put(carNumber, curTime);
+			} else {
+                String start = ps.get(carNumber);
+                ps.remove(carNumber);
+                
+                Integer diff = calcTime(start, curTime);
+                Integer temp = rt.getOrDefault(carNumber, 0);
+                rt.put(carNumber, temp + diff);
             }
         }
-
-        ps.forEach((key, value) -> {
-            String start = ps.get(key);
-            Integer use = subtractTime(start, "23:59");
-            Integer rest = useTime.getOrDefault(key, 0);
-            useTime.put(key, rest + use);
+        
+        ps.forEach((carNumber, start) -> {
+            Integer usedTime = rt.getOrDefault(carNumber, 0);
+            Integer curUseTime = calcTime(start, "23:59");
+            rt.put(carNumber, usedTime + curUseTime);
         });
-
-        int[] ans = useTime.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(
-                        e -> {
-                            int fee = 0;
-                            fee += fees[1];
-                            int curUse = e.getValue();
-                            if (fees[0] < curUse) {
-                                curUse -= fees[0];
-                                int div = curUse / fees[2];
-                                div += curUse % fees[2] == 0 ? 0 : 1;
-                                fee += div * fees[3];
-                            }
-                            return fee;
-                        }
-                )
-                .mapToInt(Integer::intValue)
-                .toArray();
-        return ans;
+        
+        List<Integer> answer = new ArrayList<>();
+        
+        rt.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(e -> {
+            Integer remain = e.getValue();
+            Integer fee = 0;
+            
+            fee += fees[1]; // 기본 요금
+            
+            remain -= fees[0]; // 기본 시간 빼기 
+            if(remain > 0) {
+                if(remain % fees[2] != 0) {
+                    fee += fees[3];
+                }
+                Integer div = remain / fees[2];
+                fee += div * fees[3];
+			}
+            answer.add(fee);
+        });
+        
+        return answer.stream().mapToInt(Integer::intValue).toArray();
     }
-
-    public Integer subtractTime(String start, String end) {
-        Integer startH = Integer.parseInt(start.split(":")[0]);
-        Integer startM = Integer.parseInt(start.split(":")[1]);
-        Integer endH = Integer.parseInt(end.split(":")[0]);
-        Integer endM = Integer.parseInt(end.split(":")[1]);
-
-        Integer restM = endM - startM;
-        if (restM < 0) { // 만약 시간이 음수가 나올경우
-            endH--;
-            restM = 60 + restM;
+    
+    public Integer calcTime(String start, String end) {
+        Integer sh = Integer.valueOf(start.split(":")[0]);
+        Integer sm = Integer.valueOf(start.split(":")[1]);
+        Integer lh = Integer.valueOf(end.split(":")[0]);
+        Integer lm = Integer.valueOf(end.split(":")[1]);
+        Integer result = 0;
+        if(lm - sm < 0) {
+            lh --;
+            lm += 60;
         }
-
-        Integer restH = endH - startH;
-        restM += restH * 60;
-
-        return restM;
+        result = (lh - sh) * 60 + lm - sm;
+        return result;
     }
 }
