@@ -1,46 +1,62 @@
-import collections
 import sys
-input = sys.stdin.readline
+from collections import deque
+N, L, R = map(int,input().split())
+country = []
+dx = [1,-1,0,0]
+dy = [0,0,1,-1]
+population_flag = True
+result = 0
  
-n, l, r = list(map(int, input().split()))
-graph = [list(map(int, input().split())) for _ in range(n)]
-dx = [0, 0, 1, -1]
-dy = [1, -1, 0, 0]
+for _ in range(N):
+    country.append([int(x) for x in sys.stdin.readline().rstrip().split()])
  
-cnt = 0
-while True:
-    visited = [[0] * n for _ in range(n)]
-    flag = True
+def bfs(x,y):
+    global population_flag
+    union_list = []
+    union_person = 0
+    deq = deque()
  
-    # 인구 이동 한 세트
-    for m in range(n):
-        for v in range(n):
-            if visited[m][v] == 0:
-                queue = collections.deque([(m, v)])
-                visited[m][v] = 1
+    visited[x][y] = True
+    union_list.append([x,y])
+    union_person += country[x][y]
+    deq.append([x,y])
  
-                # (m, v) 기준으로 연합 구하기
-                temp = [(m, v)]
-                while queue:
-                    i, j = queue.pop()
-                    for z in range(4):
-                        nx = i + dx[z]
-                        ny = j + dy[z]
-                        if 0 <= nx < n and 0 <= ny < n and visited[nx][ny] == 0:
-                            if l <= abs(graph[i][j] - graph[nx][ny]) <= r:
-                                queue.appendleft((nx, ny))
-                                visited[nx][ny] = 1
-                                temp.append((nx, ny))
+    while deq:
+        a,b = deq.popleft()
+        for i in range(4):
+            nx, ny = a + dx[i], b + dy[i]
+            if 0 <= nx < N and 0 <= ny < N and not visited[nx][ny]:
+                if L <= abs(country[a][b] - country[nx][ny]) <= R:
+                    visited[nx][ny] = True
+                    deq.append([nx,ny])
+                    union_list.append([nx,ny])
+                    union_person += country[nx][ny]
  
-                # 연합에 대해서 그래프 값 갱신하기
-                if len(temp) > 1:
-                    flag = False
-                    meanv = sum([graph[i][j] for i, j in temp]) // len(temp)
-                    for i, j in temp:
-                        graph[i][j] = meanv
+    union_len = len(union_list)
  
-    if flag:  # 더 이상 인구 이동이 없으면
-        break
-    cnt += 1
-print(cnt)
+    if union_len >= 2:
+        for u in union_list:
+            country[u[0]][u[1]] = union_person // union_len
+        population_flag = True
  
+def check(x, y):
+    for i in range(4):
+        nx, ny = x + dx[i], y + dy[i]
+        if 0 <= nx < N and 0 <= ny < N:
+            if L <= abs(country[x][y] - country[nx][ny]) <= R:
+                return 1
+    return 0
+ 
+while population_flag:
+    population_flag = False
+    visited = [[False] * N for _ in range(N)]
+    for i in range(N):
+        for j in range(N):
+            if not visited[i][j] and check(i,j):
+                bfs(i,j)
+ 
+    if population_flag:
+        result += 1
+ 
+print(result)
+
