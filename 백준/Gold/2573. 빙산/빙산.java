@@ -70,37 +70,30 @@ public class Main {
             ans = 0;
             return true;
         }
-
-        // 방문 여부를 저장하는 배열
-        boolean[][] visited = new boolean[R][C];
-        // BFS 탐색을 위한 큐
         Deque<int[]> temp = new ArrayDeque<>();
-
-        // 첫 번째 빙산 덩어리의 시작점
+        boolean[][] visited = new boolean[R][C];
         int[] first = q.peekFirst();
-        temp.add(first);
         visited[first[0]][first[1]] = true;
+        int cnt = 0;
+        temp.add(first);
 
-        int cnt = 0; // 연결된 빙산 덩어리의 크기
-
-        // BFS 탐색
         while (!temp.isEmpty()) {
-            int[] cur = temp.poll();
             cnt++;
+            int[] cur = temp.poll();
             for (int[] d : D) {
                 int nr = cur[0] + d[0];
                 int nc = cur[1] + d[1];
-                if (nr >= 0 && nr < R && nc >= 0 && nc < C && !visited[nr][nc] && MAP[nr][nc] > 0) {
-                    visited[nr][nc] = true;
-                    temp.add(new int[]{nr, nc});
-                }
+                if (!(nr > -1 && nr < R && nc > -1 && nc < C)) continue;
+                if (visited[nr][nc] || MAP[nr][nc] == 0) continue;
+                visited[nr][nc] = true;
+                temp.add(new int[]{nr, nc});
             }
         }
-
-        // 전체 빙산 덩어리의 크기와 비교하여 분리 여부 확인
+        // 2개로 나눠진 경우
         if (cnt < q.size()) {
-            return true; // 분리됨
+            return true;
+        } else {
+            return false;
         }
-        return false; // 분리되지 않음
     }
 }
