@@ -1,13 +1,7 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.PriorityQueue;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.io.*;
+import java.math.*;
 
-/**
- * 참고 : https://velog.io/@jodawooooon/Java-BOJ-1197-%EC%B5%9C%EC%86%8C-%EC%8A%A4%ED%8C%A8%EB%8B%9D-%ED%8A%B8%EB%A6%AC-MST
- * 풀지 못한 이유 : Comparable을 Implements 해서 Node Class를 직접 만들어야 한다는걸 몰랐음 (Python 처럼 List 넣으면 0번 index 기준으로 정렬될줄 
- */
 public class Main {
 	static class Node implements Comparable<Node> {
 		int to;
@@ -68,6 +62,7 @@ public class Main {
 				if(!visited[next.to]) pq.add(next);
 			}
 		}
+
 		System.out.println(ans);
 	}
 }
